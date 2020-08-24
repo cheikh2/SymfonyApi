@@ -47,11 +47,6 @@ class Moral
     private $adressEmpl;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="morals")
-     */
-    private $user;
-
-    /**
      * @ORM\OneToMany(targetEntity=Physique::class, mappedBy="moral")
      */
     private $physiques;
@@ -65,6 +60,7 @@ class Moral
     {
         $this->physiques = new ArrayCollection();
         $this->comptes = new ArrayCollection();
+        $this->operations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -128,18 +124,6 @@ class Moral
     public function setAdressEmpl(?string $adressEmpl): self
     {
         $this->adressEmpl = $adressEmpl;
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
 
         return $this;
     }

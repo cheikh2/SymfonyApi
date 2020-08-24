@@ -76,14 +76,10 @@ class Physique
      */
     private $comptes;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="physiques")
-     */
-    private $user;
-
     public function __construct()
     {
         $this->comptes = new ArrayCollection();
+        $this->operations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -238,18 +234,6 @@ class Physique
                 $compte->setPhysique(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
 
         return $this;
     }

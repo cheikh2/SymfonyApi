@@ -5,12 +5,22 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Controller\UserController;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *  collectionOperations={
+ *          "get"={
+ *                 
+ *              },
+ *         "post"={
+ *              "controller"=UserController::class
+ *      }
+ *  },
+ * )
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
 class User implements UserInterface
@@ -48,25 +58,31 @@ class User implements UserInterface
     private $isActive;
 
     /**
-     * @ORM\OneToMany(targetEntity=Moral::class, mappedBy="user")
-     */
-    private $morals;
-
-    /**
      * @ORM\OneToMany(targetEntity=Compte::class, mappedBy="user")
      */
     private $comptes;
 
     /**
-     * @ORM\OneToMany(targetEntity=Physique::class, mappedBy="user")
+     * @ORM\OneToOne(targetEntity=Moral::class, cascade={"persist", "remove"})
      */
-    private $physiques;
+    private $moral;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Physique::class, cascade={"persist", "remove"})
+     */
+    private $physique;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Operation::class, mappedBy="user")
+     */
+    private $operations;
 
     public function __construct()
     {
+        $this->isActive = true;
         $this->morals = new ArrayCollection();
         $this->comptes = new ArrayCollection();
-        $this->physiques = new ArrayCollection();
+        $this->operations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -96,11 +112,7 @@ class User implements UserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        
-
-        return array_unique($roles);
+        return[ $this->role->getLibelle()];
     }
 
     public function setRoles(array $roles): self
@@ -154,18 +166,6 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getNomcomplet(): ?string
-    {
-        return $this->nomcomplet;
-    }
-
-    public function setNomcomplet(?string $nomcomplet): self
-    {
-        $this->nomcomplet = $nomcomplet;
-
-        return $this;
-    }
-
     public function getRole(): ?Role
     {
         return $this->role;
@@ -174,37 +174,6 @@ class User implements UserInterface
     public function setRole(?Role $role): self
     {
         $this->role = $role;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Moral[]
-     */
-    public function getMorals(): Collection
-    {
-        return $this->morals;
-    }
-
-    public function addMoral(Moral $moral): self
-    {
-        if (!$this->morals->contains($moral)) {
-            $this->morals[] = $moral;
-            $moral->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMoral(Moral $moral): self
-    {
-        if ($this->morals->contains($moral)) {
-            $this->morals->removeElement($moral);
-            // set the owning side to null (unless already changed)
-            if ($moral->getUser() === $this) {
-                $moral->setUser(null);
-            }
-        }
 
         return $this;
     }
@@ -240,37 +209,58 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|Physique[]
-     */
-    public function getPhysiques(): Collection
+    public function getMoral(): ?Moral
     {
-        return $this->physiques;
+        return $this->moral;
     }
 
-    public function addPhysique(Physique $physique): self
+    public function setMoral(?Moral $moral): self
     {
-        if (!$this->physiques->contains($physique)) {
-            $this->physiques[] = $physique;
-            $physique->setUser($this);
+        $this->moral = $moral;
+
+        return $this;
+    }
+
+    public function getPhysique(): ?Physique
+    {
+        return $this->physique;
+    }
+
+    public function setPhysique(?Physique $physique): self
+    {
+        $this->physique = $physique;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Operation[]
+     */
+    public function getOperations(): Collection
+    {
+        return $this->operations;
+    }
+
+    public function addOperation(Operation $operation): self
+    {
+        if (!$this->operations->contains($operation)) {
+            $this->operations[] = $operation;
+            $operation->setUser($this);
         }
 
         return $this;
     }
 
-    public function removePhysique(Physique $physique): self
+    public function removeOperation(Operation $operation): self
     {
-        if ($this->physiques->contains($physique)) {
-            $this->physiques->removeElement($physique);
+        if ($this->operations->contains($operation)) {
+            $this->operations->removeElement($operation);
             // set the owning side to null (unless already changed)
-            if ($physique->getUser() === $this) {
-                $physique->setUser(null);
+            if ($operation->getUser() === $this) {
+                $operation->setUser(null);
             }
         }
 
         return $this;
     }
-
-
-
 }
