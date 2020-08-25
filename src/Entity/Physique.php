@@ -71,11 +71,6 @@ class Physique
      */
     private $moral;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Compte::class, mappedBy="physique")
-     */
-    private $comptes;
-
     public function __construct()
     {
         $this->comptes = new ArrayCollection();
@@ -203,37 +198,6 @@ class Physique
     public function setMoral(?Moral $moral): self
     {
         $this->moral = $moral;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Compte[]
-     */
-    public function getComptes(): Collection
-    {
-        return $this->comptes;
-    }
-
-    public function addCompte(Compte $compte): self
-    {
-        if (!$this->comptes->contains($compte)) {
-            $this->comptes[] = $compte;
-            $compte->setPhysique($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCompte(Compte $compte): self
-    {
-        if ($this->comptes->contains($compte)) {
-            $this->comptes->removeElement($compte);
-            // set the owning side to null (unless already changed)
-            if ($compte->getPhysique() === $this) {
-                $compte->setPhysique(null);
-            }
-        }
 
         return $this;
     }

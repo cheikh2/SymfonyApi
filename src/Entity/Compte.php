@@ -4,7 +4,10 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CompteRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ApiResource()
@@ -35,9 +38,9 @@ class Compte
     private $rib;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="integer")
      */
-    private $montant;
+    private $solde;
 
     /**
      * @ORM\Column(type="date", nullable=true)
@@ -50,16 +53,6 @@ class Compte
     private $dateFin;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Moral::class, inversedBy="comptes")
-     */
-    private $moral;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=Physique::class, inversedBy="comptes")
-     */
-    private $physique;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Typecompte::class, inversedBy="comptes")
      */
     private $typecompte;
@@ -68,6 +61,23 @@ class Compte
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="comptes")
      */
     private $user;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Depot::class, mappedBy="comptes")
+     */
+    private $depots;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Retrait::class, mappedBy="comptes")
+     */
+    private $retraits;
+
+    public function __construct()
+    {
+        $this->operations = new ArrayCollection();
+        $this->depots = new ArrayCollection();
+        $this->retraits = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -110,14 +120,14 @@ class Compte
         return $this;
     }
 
-    public function getMontant(): ?string
+    public function getSolde(): ?int
     {
-        return $this->montant;
+        return $this->solde;
     }
-
-    public function setMontant(?string $montant): self
+    
+    public function setSolde(int $solde): self
     {
-        $this->montant = $montant;
+        $this->solde = $solde;
 
         return $this;
     }
@@ -146,30 +156,6 @@ class Compte
         return $this;
     }
 
-    public function getMoral(): ?Moral
-    {
-        return $this->moral;
-    }
-
-    public function setMoral(?Moral $moral): self
-    {
-        $this->moral = $moral;
-
-        return $this;
-    }
-
-    public function getPhysique(): ?Physique
-    {
-        return $this->physique;
-    }
-
-    public function setPhysique(?Physique $physique): self
-    {
-        $this->physique = $physique;
-
-        return $this;
-    }
-
     public function getTypecompte(): ?Typecompte
     {
         return $this->typecompte;
@@ -182,14 +168,64 @@ class Compte
         return $this;
     }
 
-    public function getUser(): ?User
+    /**
+     * @return Collection|Depot[]
+     */
+    public function getDepots(): Collection
     {
-        return $this->user;
+        return $this->depots;
     }
 
-    public function setUser(?User $user): self
+    public function addDepot(Depot $depot): self
     {
-        $this->user = $user;
+        if (!$this->depots->contains($depot)) {
+            $this->depots[] = $depot;
+            $depot->setComptes($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDepot(Depot $depot): self
+    {
+        if ($this->depots->contains($depot)) {
+            $this->depots->removeElement($depot);
+            // set the owning side to null (unless already changed)
+            if ($depot->getComptes() === $this) {
+                $depot->setComptes(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Retrait[]
+     */
+    public function getRetraits(): Collection
+    {
+        return $this->retraits;
+    }
+
+    public function addRetrait(Retrait $retrait): self
+    {
+        if (!$this->retraits->contains($retrait)) {
+            $this->retraits[] = $retrait;
+            $retrait->setComptes($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRetrait(Retrait $retrait): self
+    {
+        if ($this->retraits->contains($retrait)) {
+            $this->retraits->removeElement($retrait);
+            // set the owning side to null (unless already changed)
+            if ($retrait->getComptes() === $this) {
+                $retrait->setComptes(null);
+            }
+        }
 
         return $this;
     }

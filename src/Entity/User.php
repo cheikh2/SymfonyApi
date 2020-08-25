@@ -73,9 +73,14 @@ class User implements UserInterface
     private $physique;
 
     /**
-     * @ORM\OneToMany(targetEntity=Operation::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Depot::class, mappedBy="user")
      */
-    private $operations;
+    private $depots;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Retrait::class, mappedBy="user")
+     */
+    private $retraits;
 
     public function __construct()
     {
@@ -83,6 +88,8 @@ class User implements UserInterface
         $this->morals = new ArrayCollection();
         $this->comptes = new ArrayCollection();
         $this->operations = new ArrayCollection();
+        $this->depots = new ArrayCollection();
+        $this->retraits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -112,7 +119,8 @@ class User implements UserInterface
      */
     public function getRoles(): array
     {
-        return[ $this->role->getLibelle()];
+        $this->roles = 'ROLE_'.strtoupper($this->role->getLibelle());
+        return array($this->roles);
     }
 
     public function setRoles(array $roles): self
@@ -234,30 +242,61 @@ class User implements UserInterface
     }
 
     /**
-     * @return Collection|Operation[]
+     * @return Collection|Depot[]
      */
-    public function getOperations(): Collection
+    public function getDepots(): Collection
     {
-        return $this->operations;
+        return $this->depots;
     }
 
-    public function addOperation(Operation $operation): self
+    public function addDepot(Depot $depot): self
     {
-        if (!$this->operations->contains($operation)) {
-            $this->operations[] = $operation;
-            $operation->setUser($this);
+        if (!$this->depots->contains($depot)) {
+            $this->depots[] = $depot;
+            $depot->setUser($this);
         }
 
         return $this;
     }
 
-    public function removeOperation(Operation $operation): self
+    public function removeDepot(Depot $depot): self
     {
-        if ($this->operations->contains($operation)) {
-            $this->operations->removeElement($operation);
+        if ($this->depots->contains($depot)) {
+            $this->depots->removeElement($depot);
             // set the owning side to null (unless already changed)
-            if ($operation->getUser() === $this) {
-                $operation->setUser(null);
+            if ($depot->getUser() === $this) {
+                $depot->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Retrait[]
+     */
+    public function getRetraits(): Collection
+    {
+        return $this->retraits;
+    }
+
+    public function addRetrait(Retrait $retrait): self
+    {
+        if (!$this->retraits->contains($retrait)) {
+            $this->retraits[] = $retrait;
+            $retrait->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRetrait(Retrait $retrait): self
+    {
+        if ($this->retraits->contains($retrait)) {
+            $this->retraits->removeElement($retrait);
+            // set the owning side to null (unless already changed)
+            if ($retrait->getUser() === $this) {
+                $retrait->setUser(null);
             }
         }
 
