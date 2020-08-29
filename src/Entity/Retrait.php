@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\RetraitRepository;
 use App\Controller\RetraitController;
@@ -31,11 +32,13 @@ class Retrait
     private $id;
 
     /**
+     * @Groups("compte:read")
      * @ORM\Column(type="integer")
      */
     private $montant;
 
     /**
+     * @Groups("compte:read")
      * @ORM\Column(type="datetime")
      */
     private $dateRetrait;

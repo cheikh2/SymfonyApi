@@ -32,11 +32,13 @@ class Depot
     private $id;
 
     /**
+     * @Groups("compte:read")
      * @ORM\Column(type="integer")
      */
     private $montant;
 
     /**
+     * @Groups("compte:read")
      * @ORM\Column(type="datetime")
      */
     private $dateDepot;

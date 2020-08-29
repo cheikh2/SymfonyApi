@@ -2,57 +2,73 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CompteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ * normalizationContext={"groups"={"compte:read"}},
+ * denormalizationContext={"groups"={"compte:write"}}
+ * )
+ * @ApiFilter(SearchFilter::class, properties={"numCompte": "exact"})
  * @ORM\Entity(repositoryClass=CompteRepository::class)
  */
 class Compte
 {
     /**
+     * @Groups("read")
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * 
+     * @Groups("compte:read")
      */
     private $id;
 
     /**
+     * @Groups({"compte:read", "compte:write"})
      * @ORM\Column(type="string", length=255)
      */
     private $numAgence;
 
     /**
+     * @Groups({"compte:read", "compte:write"})
      * @ORM\Column(type="string", length=255)
      */
     private $numCompte;
 
     /**
+     * @Groups("compte:write")
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $rib;
 
     /**
+     * @Groups({"compte:read", "compte:write"})
      * @ORM\Column(type="integer")
      */
     private $solde;
 
     /**
+     * @Groups({"compte:read", "compte:write"})
      * @ORM\Column(type="date", nullable=true)
      */
     private $dateDebut;
 
     /**
+     * @Groups({"compte:read", "compte:write"})
      * @ORM\Column(type="date", nullable=true)
      */
     private $dateFin;
 
     /**
+     * @Groups({"compte:read", "compte:write"})
      * @ORM\ManyToOne(targetEntity=Typecompte::class, inversedBy="comptes")
      */
     private $typecompte;
@@ -63,11 +79,13 @@ class Compte
     private $user;
 
     /**
+     * @Groups({"compte:read", "compte:write"})
      * @ORM\OneToMany(targetEntity=Depot::class, mappedBy="comptes")
      */
     private $depots;
 
     /**
+     * @Groups({"compte:read", "compte:write"})
      * @ORM\OneToMany(targetEntity=Retrait::class, mappedBy="comptes")
      */
     private $retraits;
